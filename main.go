@@ -10,8 +10,8 @@ import (
 
 const DELAY = 25
 
-func cleanExit(sigChan chan<- os.Signal) {
-	fmt.Printf("Exiting with signal: %v\n", sigChan)
+func cleanExit(sigVal os.Signal) {
+	fmt.Printf("Exiting with signal: %v\n", sigVal)
 	os.Exit(1)
 }
 
@@ -23,8 +23,8 @@ func main() {
 	signal.Notify(sigChan, syscall.SIGKILL)
 
 	go func() {
-		<-sigChan
-		cleanExit(sigChan)
+		sigVal := <-sigChan
+		cleanExit(sigVal)
 	}()
 
 	for {
