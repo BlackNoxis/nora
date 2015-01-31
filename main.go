@@ -1,5 +1,6 @@
 package main
 
+import notify "github.com/mqu/go-notify"
 import (
 	"fmt"
 	"os"
@@ -8,11 +9,30 @@ import (
 	"time"
 )
 
-const DELAY = 25
+const (
+	DELAY     = 25
+	NOTEDELAY = 1000
+)
+
+func sendNote(note *notify.NotifyNotification) {
+	if note == nil {
+		fmt.Printf("Note is nil\n")
+		os.Exit(1)
+	}
+
+	note.SetTimeout(NOTEDELAY)
+	if err := note.Show(); err != nil {
+		// err is never nil? Catching SIGABRT from cgo execution.
+		fmt.Printf("note.Show() caught error: %v\n", err.Message())
+	}
+	time.Sleep(NOTEDELAY * time.Millisecond)
+	note.Close()
+}
 
 func cleanExit(sigVal os.Signal) {
 	fmt.Printf("Exiting with signal: %v\n", sigVal)
-	os.Exit(1)
+	notify.UnInit()
+	os.Exit(0)
 }
 
 func main() {
@@ -27,8 +47,11 @@ func main() {
 		cleanExit(sigVal)
 	}()
 
+	notify.Init("Nora")
+
 	for {
 		time.Sleep(DELAY * time.Second)
-		fmt.Printf("Hello World!\n")
+		note := notify.NotificationNew("Message from Nora", "Helpful text goes here.", "")
+		go sendNote(note)
 	}
 }
