@@ -11,7 +11,7 @@ import (
 
 const (
 	DELAY     = 25
-	NOTEDELAY = 1000
+	NOTEDELAY = 10000
 )
 
 func sendNote(note *notify.NotifyNotification) {
